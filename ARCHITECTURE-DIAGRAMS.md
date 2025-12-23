@@ -211,7 +211,7 @@ gantt
 flowchart TD
     Start([Customer Notifies<br/>Clark of Exit]) --> Knowledge[Knowledge Transfer<br/>• Documentation review<br/>• Training sessions<br/>• Handover meetings<br/>• Q&A sessions]
     Knowledge --> Access[Access Transfer<br/>• Customer already has full access<br/>• Transfer operational access<br/>• Credential handover<br/>• Access verification]
-    Access --> Code[Code & Config Transfer<br/>• Repository access (already owned)<br/>• Configuration export<br/>• State transfer<br/>• Complete documentation package]
+    Access --> Code["Code & Config Transfer<br/>• Repository access already owned<br/>• Configuration export<br/>• State transfer<br/>• Complete documentation package"]
     Code --> Support[Support Transition<br/>• Optional transition period<br/>• Support handoff<br/>• Final review and sign-off]
     Support --> End([Exit Complete])
     

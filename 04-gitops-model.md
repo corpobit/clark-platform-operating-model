@@ -150,10 +150,10 @@ Application GitOps manages application deployments through Git-driven workflows.
 
 ```mermaid
 flowchart LR
-    A[Application<br/>Code Change] --> B[CI/CD Pipeline<br/>(Customer Owned)]
-    B --> C[Application GitOps Repo<br/>(Customer Owned)]
-    C --> D[Application GitOps Tool<br/>(ArgoCD/Flux)]
-    D --> E[Kubernetes<br/>Cluster]
+    A["Application<br/>Code Change"] --> B["CI/CD Pipeline<br/>Customer Owned"]
+    B --> C["Application GitOps Repo<br/>Customer Owned"]
+    C --> D["Application GitOps Tool<br/>ArgoCD/Flux"]
+    D --> E["Kubernetes<br/>Cluster"]
 ```
 
 ### Clark's Role in Application GitOps

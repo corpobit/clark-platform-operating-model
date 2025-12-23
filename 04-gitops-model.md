@@ -49,11 +49,18 @@ All requests from the dashboard are processed by Clark, who then creates the nec
 
 Platform GitOps manages infrastructure and cloud services through Git-driven workflows.
 
+### Critical Boundary
+
+**Clark GitOps applies only to platform and cloud resources, not application deployments.**
+
+This explicit boundary prevents scope creep, clarifies sales conversations, and protects against contractual risk. Application deployments remain customer responsibility.
+
 ### Repository
 
 - **Repository**: `clark-platform-control`
 - **Technology**: Crossplane
 - **Workflow**: Developer Request (Dashboard) → Clark Review → Clark Creates PR → Merge → Apply
+- **Scope**: Platform infrastructure and cloud services only
 
 ### Workflow
 

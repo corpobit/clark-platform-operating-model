@@ -4,6 +4,8 @@
 
 Clark Platform baseline includes two core repositories. Additional services are available as contract add-ons based on customer needs.
 
+**Why Optional Services**: Optional services are offered to adapt Clark to customer needs without enforcing tooling choices or vendor lock-in. This shows intentional design, not incompleteness. We provide flexibility while maintaining clear boundaries.
+
 ## Service Categories
 
 ### 1. Secrets Management

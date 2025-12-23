@@ -69,6 +69,12 @@ The infrastructure layer uses Terraform to provision and manage foundational clo
 - **Logging & Monitoring Baselines**: CloudWatch, Cloud Logging, Azure Monitor setup
 - **Terraform State & Backend**: State storage and locking
 
+### Critical Boundary
+
+**Terraform is the only tool used for account, network, and cluster provisioning. Crossplane is never used to bootstrap accounts or clusters.**
+
+This prevents operational complexity and signals maturity. Crossplane is reserved for managed cloud services only.
+
 ### What It Does NOT Do
 
 - Application deployments
@@ -78,7 +84,7 @@ The infrastructure layer uses Terraform to provision and manage foundational clo
 
 ### Technology Stack
 
-- **Terraform**: Infrastructure provisioning
+- **Terraform**: Infrastructure provisioning (exclusive tool for foundational infrastructure)
 - **Cloud Providers**: AWS, GCP, Azure
 - **State Backend**: S3, GCS, Azure Storage (customer-owned)
 
@@ -107,6 +113,8 @@ The control plane layer uses Crossplane to manage cloud services declaratively t
 - **Development Teams**: Request resources/services via Clark dashboard, report incidents, create cases
 - **Clark Operations**: Review requests, create PRs, approve changes
 - **Crossplane**: Provisions resources automatically
+
+**Important**: Crossplane is used exclusively for managed cloud services (databases, storage, queues). It is never used for account, network, or cluster provisioning - those remain Terraform-only.
 
 ## GitOps Model
 

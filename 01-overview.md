@@ -81,6 +81,8 @@ If you already have infrastructure in place, Clark can import all existing Terra
 - Runtime application operations
 - Application monitoring and alerting
 
+**Important**: Clark does not deploy, operate, or troubleshoot application code unless explicitly agreed as a separate engagement.
+
 ## Optional Services
 
 Clark offers additional services as contract add-ons:
@@ -90,6 +92,8 @@ Clark offers additional services as contract add-ons:
 - **CI/CD**: GitHub Actions, GitLab CI, Bitbucket pipelines
 - **Observability**: Prometheus, Grafana, cloud-native tools
 - **Security**: OPA, Kyverno, cloud-native controls
+
+**Why Optional Services**: Optional services are offered to adapt Clark to customer needs without enforcing tooling choices or vendor lock-in. This shows intentional design, not incompleteness.
 
 ## Control Boundaries
 
@@ -102,6 +106,17 @@ Clark offers additional services as contract add-ons:
 | CI/CD | Optional | Owns |
 | Exit capability | Always | Guaranteed |
 
+## What Clark is NOT
+
+Clark is explicitly not:
+
+- **Not an application hosting provider**: We manage infrastructure, not applications
+- **Not a CI/CD vendor**: CI/CD is customer-owned (optional support available)
+- **Not a cloud reseller**: We operate in customer-owned cloud accounts
+- **Not a black-box managed service**: All code and configurations are customer-owned and transparent
+
+This clarity prevents misinterpretation and sets proper expectations.
+
 ## Why This Model Works
 
 1. **Trust**: Customers own everything, eliminating vendor lock-in concerns
@@ -109,6 +124,7 @@ Clark offers additional services as contract add-ons:
 3. **Focus**: Customers focus on product, not platform
 4. **Flexibility**: Optional services allow customization
 5. **Exit Strategy**: Customers can always take full control
+6. **Risk Reduction**: Full ownership and exit capability reduce compliance and operational risks
 
 ## Next Steps
 

@@ -117,11 +117,35 @@ flowchart TB
 - Application CI/CD (optional)
 - Application monitoring (optional)
 
+**Hard Boundary**: Clark does not deploy, operate, or troubleshoot application code unless explicitly agreed as a separate engagement.
+
 **Why**: You focus on product, we focus on platform
 
 ---
 
-## Slide 7.5: Customization & Migration
+## Slide 7.5: What Clark is NOT
+
+### Clear Expectations
+
+Clark is explicitly not:
+
+❌ **Not an application hosting provider**
+- We manage infrastructure, not applications
+
+❌ **Not a CI/CD vendor**
+- CI/CD is customer-owned (optional support available)
+
+❌ **Not a cloud reseller**
+- We operate in customer-owned cloud accounts
+
+❌ **Not a black-box managed service**
+- All code and configurations are customer-owned and transparent
+
+**This clarity prevents misinterpretation and sets proper expectations.**
+
+---
+
+## Slide 7.6: Customization & Migration
 
 ### Flexible Setup
 
@@ -152,6 +176,8 @@ flowchart TB
 - Application configurations
 - Your CI/CD
 
+**Critical Boundary**: Clark GitOps applies only to platform and cloud resources, not application deployments. This prevents scope creep and protects contractual boundaries.
+
 **Workflow**:
 
 ```mermaid
@@ -177,6 +203,8 @@ flowchart LR
 | **CI/CD** | GitHub Actions, GitLab CI |
 | **Observability** | Prometheus, Grafana |
 | **Security** | OPA, Kyverno |
+
+**Why Optional**: Optional services adapt Clark to customer needs without enforcing tooling choices or vendor lock-in. This shows intentional design, not incompleteness.
 
 **Principle**: Start simple, add complexity as needed
 
@@ -235,6 +263,8 @@ flowchart LR
 ✅ **Exit**: Can exit anytime, no lock-in
 
 **Trust Through Ownership**: We operate, you own
+
+**Risk & Compliance Benefits**: Full ownership reduces regulatory compliance risk, simplifies audits, ensures business continuity, and maintains data sovereignty.
 
 ---
 

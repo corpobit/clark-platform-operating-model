@@ -58,6 +58,8 @@ This document clearly defines who is responsible for what in the Clark Platform 
 | Application scaling | ❌ | ✅ | Customer manages |
 | Application debugging | ❌ | ✅ | Customer responsibility |
 
+**Hard Boundary**: Clark does not deploy, operate, or troubleshoot application code unless explicitly agreed as a separate engagement. This protects scope and prevents scope creep.
+
 ### Security and Access
 
 | Responsibility | Clark | Customer | Notes |

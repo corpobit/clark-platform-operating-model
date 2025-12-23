@@ -80,8 +80,8 @@ The control plane layer uses Crossplane to manage cloud services declaratively t
 
 ### Usage Model
 
-- **Development Teams**: Create PRs to request cloud resources
-- **Clark Operations**: Review and approve changes
+- **Development Teams**: Request resources/services via Clark dashboard, report incidents, create cases
+- **Clark Operations**: Review requests, create PRs, approve changes
 - **Crossplane**: Provisions resources automatically
 
 ## GitOps Model
@@ -97,11 +97,12 @@ The control plane layer uses Crossplane to manage cloud services declaratively t
 
 ```mermaid
 flowchart LR
-    A[Developer PR] --> B[Customer Git Repo<br/>clark-platform-control]
-    B --> C[Clark Review & Approval]
-    C --> D[Crossplane Control Plane]
-    D --> E[Cloud Provider API]
-    E --> F[Resource Provisioned]
+    A[Developer Request<br/>via Clark Dashboard] --> B[Clark Reviews<br/>& Creates PR]
+    B --> C[Customer Git Repo<br/>clark-platform-control]
+    C --> D[Clark Approval]
+    D --> E[Crossplane Control Plane]
+    E --> F[Cloud Provider API]
+    F --> G[Resource Provisioned]
 ```
 
 ### Application GitOps
@@ -119,11 +120,12 @@ Clark does not own or operate application GitOps. This remains the customer's re
 
 ### Service Provisioning
 
-1. Developer creates PR in `clark-platform-control`
-2. PR defines desired cloud service (e.g., RDS database)
-3. Clark reviews and approves
-4. Crossplane provisions the service
-5. Service credentials are stored in Kubernetes secrets
+1. Developer requests service via Clark dashboard (e.g., RDS database)
+2. Clark reviews the request
+3. Clark creates PR in `clark-platform-control` with service definition
+4. Clark approves and merges the PR
+5. Crossplane provisions the service
+6. Service credentials are stored in Kubernetes secrets
 
 ### Application Deployment
 

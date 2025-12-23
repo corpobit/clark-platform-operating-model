@@ -111,10 +111,11 @@ clark-platform-control/
 
 ### Ongoing Operations
 
-1. **Change Requests**: Developers create PRs
-2. **Clark Review**: Clark team reviews and approves
-3. **Automation**: Changes applied via GitOps
-4. **Monitoring**: Clark monitors infrastructure health
+1. **Change Requests**: Developers request via Clark dashboard or create issues in repo
+2. **Clark Review**: Clark team reviews requests
+3. **PR Creation**: Clark creates PRs in repository
+4. **Automation**: Changes applied via GitOps
+5. **Monitoring**: Clark monitors infrastructure health
 
 ### Ownership Transfer
 
@@ -189,10 +190,11 @@ flowchart TB
 
 ### Change Management
 
-1. **Pull Requests**: All changes via PR
-2. **Review Process**: Clark reviews infrastructure changes
-3. **Testing**: Changes tested in development first
-4. **Deployment**: Automated via GitOps or Terraform
+1. **Request Process**: Developers request via Clark dashboard or create issues
+2. **PR Creation**: Clark creates PRs for approved changes
+3. **Review Process**: Clark reviews infrastructure changes
+4. **Testing**: Changes tested in development first
+5. **Deployment**: Automated via GitOps or Terraform
 
 ## Documentation
 

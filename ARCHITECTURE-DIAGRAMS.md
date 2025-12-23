@@ -32,22 +32,25 @@ flowchart TB
 ```mermaid
 sequenceDiagram
     participant Dev as Developer
+    participant Dashboard as Clark Dashboard
+    participant Clark as Clark Team
     participant Repo as clark-platform-control<br/>Repository<br/>(Customer Owned)
-    participant Clark as Clark Team Review
-    participant Main as Main Branch
     participant XP as Crossplane Controller
     participant Cloud as Cloud Provider API<br/>(AWS/GCP/Azure)
     participant Resource as Resource Provisioned
     
-    Dev->>Repo: Creates PR<br/>(Service Definition,<br/>Crossplane Resource)
-    Repo->>Clark: Review Request
+    Dev->>Dashboard: Request Resource/Service<br/>Report Incident<br/>Create Case
+    Dashboard->>Clark: Review Request
     Clark->>Clark: Policy Compliance<br/>Resource Limits<br/>Best Practices
-    Clark->>Main: Approve & Merge
-    Main->>XP: Detects Change
+    Clark->>Repo: Creates PR<br/>(Service Definition,<br/>Crossplane Resource)
+    Clark->>Repo: Approve & Merge
+    Repo->>XP: Detects Change
     XP->>XP: Reconciles State
     XP->>Cloud: API Call
     Cloud->>Resource: Provision Resource<br/>(Database/Storage/Queue)
     Resource->>Resource: Credentials in K8s Secrets
+    Resource->>Dashboard: Status Update
+    Dashboard->>Dev: Notification
 ```
 
 ## Responsibility Matrix Visual
@@ -109,12 +112,13 @@ flowchart TB
 
 ```mermaid
 flowchart TD
-    Start([Developer Needs Service<br/>I need a database]) --> CreatePR[Create PR in Repository<br/>apiVersion: database.example.org/v1<br/>kind: Database<br/>spec: engine: postgres, version: 14]
-    CreatePR --> Review[Clark Reviews PR<br/>✓ Policy compliance<br/>✓ Resource limits<br/>✓ Best practices<br/>✓ Approved]
-    Review --> Merge[PR Merged to Main]
+    Start([Developer Needs Service<br/>I need a database]) --> Request[Request via Clark Dashboard<br/>Fill in details:<br/>engine: postgres, version: 14]
+    Request --> Review[Clark Reviews Request<br/>✓ Policy compliance<br/>✓ Resource limits<br/>✓ Best practices<br/>✓ Approved]
+    Review --> CreatePR[Clark Creates PR in Repository<br/>apiVersion: database.example.org/v1<br/>kind: Database<br/>spec: engine: postgres, version: 14]
+    CreatePR --> Merge[Clark Merges PR to Main]
     Merge --> Detect[Crossplane Detects Change<br/>• Watches Git repository<br/>• Detects new resource<br/>• Starts reconciliation]
     Detect --> API[Cloud Provider API Call<br/>• Create RDS / Cloud SQL / etc.<br/>• Configure networking<br/>• Set up security]
-    API --> Provisioned[Resource Provisioned<br/>• Database created<br/>• Credentials in K8s secrets<br/>• Status updated in Git<br/>• Ready for use]
+    API --> Provisioned[Resource Provisioned<br/>• Database created<br/>• Credentials in K8s secrets<br/>• Status updated in Git & Dashboard<br/>• Developer notified]
 ```
 
 ## Access Control Model
@@ -131,7 +135,7 @@ flowchart TD
     subgraph RepoLevel["REPOSITORY LEVEL"]
         RepoCust[Customer: Repository Owner<br/>Full Control]
         RepoClark[Clark: Maintainer<br/>Can merge PRs, cannot delete]
-        RepoDev[Development Teams: Contributor<br/>Can create PRs]
+        RepoDev[Development Teams: Contributor<br/>Can create issues in repo]
     end
     
     subgraph K8sLevel["KUBERNETES CLUSTER LEVEL"]

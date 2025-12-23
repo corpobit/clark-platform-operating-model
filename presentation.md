@@ -137,11 +137,12 @@ flowchart TB
 
 ```mermaid
 flowchart LR
-    A[Developer PR] --> B[Your Repo]
-    B --> C[Clark Review]
-    C --> D[Crossplane]
-    D --> E[Cloud Provider]
-    E --> F[Resource Created]
+    A[Developer Request<br/>via Clark Dashboard] --> B[Clark Review]
+    B --> C[Clark Creates PR<br/>in Your Repo]
+    C --> D[Clark Merges]
+    D --> E[Crossplane]
+    E --> F[Cloud Provider]
+    F --> G[Resource Created]
 ```
 
 ---

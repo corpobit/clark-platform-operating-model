@@ -4,6 +4,29 @@
 
 Clark Platform uses a GitOps model with two distinct layers: Platform GitOps (managed by Clark) and Application GitOps (managed by customer).
 
+## Clark Dashboard
+
+### Purpose
+
+The Clark dashboard is the primary interface for development teams to interact with the platform. It provides a user-friendly way to request resources, report incidents, and manage cases without requiring direct Git repository access.
+
+### Features
+
+- **Resource Requests**: Request cloud services (databases, storage, queues) via intuitive forms
+- **Incident Reporting**: Report infrastructure incidents and issues
+- **Case Management**: Create and track support cases
+- **Status Tracking**: Monitor request status and resource provisioning
+- **Notifications**: Receive updates on request status and resource availability
+
+### Alternative Methods
+
+- **Repository Issues**: Developers can create issues in the repository for requests or questions
+- **Direct Communication**: Contact Clark team directly for urgent matters
+
+### Workflow Integration
+
+All requests from the dashboard are processed by Clark, who then creates the necessary PRs in the repository following GitOps best practices.
+
 ## Two-Layer GitOps Architecture
 
 ### Layer Separation
@@ -30,22 +53,25 @@ Platform GitOps manages infrastructure and cloud services through Git-driven wor
 
 - **Repository**: `clark-platform-control`
 - **Technology**: Crossplane
-- **Workflow**: Git PR → Review → Merge → Apply
+- **Workflow**: Developer Request (Dashboard) → Clark Review → Clark Creates PR → Merge → Apply
 
 ### Workflow
 
 ```mermaid
 sequenceDiagram
     participant Dev as Developer
+    participant Dashboard as Clark Dashboard
+    participant Clark as Clark Team
     participant Repo as Customer Git Repository<br/>(clark-platform-control)
-    participant Clark as Clark Review & Approval
     participant XP as Crossplane Control Plane
     participant Cloud as Cloud Provider API
     participant Resource as Resource Provisioned
     
-    Dev->>Repo: Creates PR<br/>(Cloud Service)
-    Repo->>Clark: Review Request
-    Clark->>Repo: Approve
+    Dev->>Dashboard: Request Resource/Service<br/>Report Incident<br/>Create Case
+    Dashboard->>Clark: Review Request
+    Clark->>Clark: Validate & Approve
+    Clark->>Repo: Creates PR<br/>(Service Definition)
+    Clark->>Repo: Approve & Merge
     Repo->>XP: PR Merged
     XP->>Cloud: API Call
     Cloud->>Resource: Provision Resource
@@ -53,7 +79,17 @@ sequenceDiagram
 
 ### Example: Requesting a Database
 
-1. **Developer creates PR**:
+1. **Developer requests via Clark dashboard**:
+   - Opens Clark dashboard
+   - Selects "Request Database"
+   - Fills in details (engine: postgres, version: 14, size: small)
+   - Submits request
+
+2. **Clark reviews request**:
+   - Checks compliance with policies
+   - Verifies resource limits
+   - Ensures proper configuration
+   - Creates PR in repository:
    ```yaml
    apiVersion: database.example.org/v1alpha1
    kind: Database
@@ -65,18 +101,14 @@ sequenceDiagram
      size: small
    ```
 
-2. **Clark reviews PR**:
-   - Checks compliance with policies
-   - Verifies resource limits
-   - Ensures proper configuration
-
-3. **PR merged**:
+3. **Clark merges PR**:
    - Crossplane detects change
    - Provisions database in cloud
    - Updates status in Git
 
 4. **Database available**:
    - Credentials stored in Kubernetes secrets
+   - Developer notified via dashboard
    - Developer can use database
 
 ### What Platform GitOps Manages
@@ -165,15 +197,15 @@ State visible in Git:
 
 ### Platform Changes
 
-1. **Request**: Developer creates PR
-2. **Review**: Clark team reviews
+1. **Request**: Developer requests via Clark dashboard (or creates issue in repo)
+2. **Review**: Clark team reviews request
    - Policy compliance
    - Resource limits
    - Best practices
-3. **Approval**: Clark approves or requests changes
-4. **Merge**: PR merged to main branch
+3. **Create PR**: Clark creates PR in repository
+4. **Approval**: Clark approves and merges PR
 5. **Apply**: Crossplane applies changes
-6. **Verify**: Status updated in Git
+6. **Verify**: Status updated in Git and dashboard
 
 ### Application Changes
 
@@ -218,10 +250,13 @@ State visible in Git:
 
 ### For Development Teams
 
-- **Self-Service**: Request resources via PR
+- **Self-Service**: Request resources via Clark dashboard
+- **Incident Reporting**: Report incidents via dashboard
+- **Case Management**: Create cases via dashboard
+- **Issue Tracking**: Create issues in repository
 - **Speed**: Faster than manual processes
 - **Consistency**: Standardized patterns
-- **Learning**: See infrastructure patterns
+- **Visibility**: Track requests and status in dashboard
 
 ## Best Practices
 

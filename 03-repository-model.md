@@ -128,11 +128,11 @@ clark-platform-control/
 
 ```mermaid
 flowchart TB
-    Infra[clark-platform-infra (Terraform)<br/>• Provisions foundational infra<br/>• Creates Kubernetes cluster] --> K8s[Kubernetes Cluster<br/>(Customer Owned)]
+    Infra["clark-platform-infra<br/>Terraform<br/>• Provisions foundational infra<br/>• Creates Kubernetes cluster"] --> K8s["Kubernetes Cluster<br/>Customer Owned"]
     
     subgraph K8s
-        Control[clark-platform-control (Crossplane)<br/>• Manages cloud services<br/>• Installed on cluster]
-        Apps[Application Workloads<br/>(Customer Owned)]
+        Control["clark-platform-control<br/>Crossplane<br/>• Manages cloud services<br/>• Installed on cluster"]
+        Apps["Application Workloads<br/>Customer Owned"]
     end
 ```
 

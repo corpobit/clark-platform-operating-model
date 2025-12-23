@@ -7,16 +7,16 @@
 ```mermaid
 flowchart TB
     subgraph CloudAccount["Customer Cloud Account (Customer Owned)"]
-        subgraph InfraRepo["clark-platform-infra Repository<br/>(Customer Owned, Clark Maintained)"]
+        subgraph InfraRepo["clark-platform-infra Repository<br/>Customer Owned, Clark Maintained"]
             Terraform["Terraform Modules<br/>• Networking (VPC/VNet, Subnets, Routing)<br/>• Kubernetes Clusters (EKS/GKE/AKS)<br/>• IAM Roles & Policies<br/>• Logging & Monitoring Setup<br/>• Terraform State Backend"]
         end
         
-        subgraph K8sCluster["Kubernetes Cluster (Customer Owned)"]
-            subgraph ControlPlane["clark-platform-control (Crossplane)<br/>(Customer Owned, Clark Maintained)"]
+        subgraph K8sCluster["Kubernetes Cluster<br/>Customer Owned"]
+            subgraph ControlPlane["clark-platform-control<br/>Crossplane<br/>Customer Owned, Clark Maintained"]
                 Crossplane["• Crossplane Core<br/>• Provider Configs (AWS/GCP/Azure)<br/>• Compositions (Databases, Storage, Queues)<br/>• Policies (OPA, Resource Limits)<br/>• GitOps Controller"]
             end
             
-            subgraph Apps["Application Workloads<br/>(Customer Owned & Operated)"]
+            subgraph Apps["Application Workloads<br/>Customer Owned & Operated"]
                 AppWorkloads["• Application Pods<br/>• Application Services<br/>• Application ConfigMaps & Secrets"]
             end
         end
@@ -90,15 +90,15 @@ flowchart LR
 ```mermaid
 flowchart TB
     subgraph RepoEco["REPOSITORY ECOSYSTEM"]
-        subgraph InfraRepo["clark-platform-infra (Terraform)<br/>Owner: Customer | Maintainer: Clark"]
+        subgraph InfraRepo["clark-platform-infra<br/>Terraform<br/>Owner: Customer | Maintainer: Clark"]
             InfraStruct["Structure:<br/>├── environments/<br/>│   ├── dev/<br/>│   ├── staging/<br/>│   └── production/<br/>├── modules/<br/>│   ├── networking/<br/>│   ├── kubernetes/<br/>│   └── iam/<br/>└── terraform.tf"]
         end
         
-        subgraph ControlRepo["clark-platform-control (Crossplane)<br/>Owner: Customer | Maintainer: Clark"]
+        subgraph ControlRepo["clark-platform-control<br/>Crossplane<br/>Owner: Customer | Maintainer: Clark"]
             ControlStruct["Structure:<br/>├── compositions/<br/>│   ├── databases/<br/>│   ├── storage/<br/>│   └── queues/<br/>├── providers/<br/>│   ├── aws/<br/>│   ├── gcp/<br/>│   └── azure/<br/>├── policies/<br/>└── examples/"]
         end
         
-        subgraph AppRepo["Application Repositories (Optional)<br/>Owner: Customer | Managed: Customer<br/>(Clark can support)"]
+        subgraph AppRepo["Application Repositories<br/>Optional<br/>Owner: Customer | Managed: Customer<br/>Clark can support"]
             AppStruct["• Application Code<br/>• Application GitOps (ArgoCD/Flux)<br/>• CI/CD Pipelines"]
         end
     end

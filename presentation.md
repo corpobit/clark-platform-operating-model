@@ -87,7 +87,7 @@ flowchart TB
 ✅ **Infrastructure Layer**
 - Cloud account setup
 - Networking (VPC/VNet, subnets)
-- Kubernetes clusters
+- Kubernetes clusters (baseline model)
 - IAM and security
 - Monitoring baselines
 
@@ -103,6 +103,8 @@ flowchart TB
 - Documentation
 - Training
 
+**Note**: This is the baseline. For different infrastructure models (serverless, edge computing, etc.), we customize the setup to match your architecture.
+
 ---
 
 ## Slide 7: What's NOT Included
@@ -116,6 +118,23 @@ flowchart TB
 - Application monitoring (optional)
 
 **Why**: You focus on product, we focus on platform
+
+---
+
+## Slide 7.5: Customization & Migration
+
+### Flexible Setup
+
+✅ **Infrastructure Model Customization**
+- Baseline: Kubernetes-based architecture
+- Custom: Serverless, edge computing, hybrid
+- We adapt to your architecture needs
+
+✅ **Existing Infrastructure Import**
+- Already have infrastructure?
+- We can import all Terraform states
+- Seamless transition to Clark management
+- No disruption to your operations
 
 ---
 

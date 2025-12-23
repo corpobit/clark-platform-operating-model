@@ -7,6 +7,30 @@ Clark Platform consists of two core layers that work together to provide managed
 1. **Infrastructure Layer** (Terraform)
 2. **Control Plane Layer** (Crossplane)
 
+### Baseline Architecture
+
+The baseline architecture assumes a **Kubernetes-based infrastructure model**. This includes:
+- Kubernetes clusters for container orchestration
+- Traditional compute, storage, and networking resources
+- Standard cloud service patterns
+
+### Customization
+
+Clark can customize the infrastructure model to match your specific architecture:
+
+- **Serverless Architecture**: Adapted for serverless-first deployments (Lambda, Functions, etc.)
+- **Edge Computing**: Configured for edge and distributed infrastructure
+- **Hybrid Cloud**: Multi-cloud and hybrid scenarios
+- **Traditional**: Standard Kubernetes-based platform (baseline)
+
+### Existing Infrastructure Import
+
+If you have existing infrastructure, Clark can import all Terraform states upon your request:
+- Assessment of existing infrastructure
+- Import plan development
+- State migration with zero downtime
+- Gradual transition to Clark management
+
 ## Component Diagram
 
 ```mermaid

@@ -42,6 +42,23 @@ These two repositories are:
 - Fully owned by the customer
 - Maintained by Clark under contract
 
+### Baseline Architecture
+
+The baseline setup assumes a **Kubernetes-based architecture**. However, Clark can customize the infrastructure model to match your specific needs:
+
+- **Serverless Architecture**: Customized for serverless-first deployments
+- **Edge Computing**: Adapted for edge and distributed infrastructure
+- **Hybrid Cloud**: Configured for multi-cloud and hybrid scenarios
+- **Traditional**: Standard Kubernetes-based platform
+
+### Existing Infrastructure
+
+If you already have infrastructure in place, Clark can import all existing Terraform states upon your request. This allows for:
+- Seamless transition to Clark management
+- No disruption to existing operations
+- Preservation of all existing configurations
+- Gradual migration path
+
 ## What Clark Does
 
 ### Included in Baseline

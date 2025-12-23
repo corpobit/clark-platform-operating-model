@@ -53,12 +53,21 @@ This document outlines the step-by-step process for onboarding a new customer to
   - Network topology preferences
   - Security requirements
   - Compliance needs
+  - Infrastructure model (Kubernetes baseline, serverless, edge, etc.)
+  - Existing infrastructure assessment
 
 - **Configuration Customization**
   - Terraform variables configured
   - Crossplane compositions customized
   - Policies defined
   - Naming conventions established
+  - Architecture model adapted if different from baseline
+
+- **Existing Infrastructure Import** (if applicable)
+  - Assessment of existing Terraform states
+  - Import plan development
+  - State migration strategy
+  - Import execution upon customer approval
 
 ### Phase 2: Infrastructure Provisioning (Week 2-3)
 

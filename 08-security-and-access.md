@@ -35,17 +35,11 @@ Security and access control are fundamental to the Clark Platform operating mode
 - Audit logging enabled
 
 **Access Levels**:
-```
-Customer Account Owner
-    ↓
-Clark IAM Role (Operational)
-    ↓
-Specific Permissions
-    - Infrastructure provisioning
-    - Resource management
-    - Monitoring access
-    - No billing access
-    - No account deletion
+
+```mermaid
+flowchart TD
+    A[Customer Account Owner] --> B[Clark IAM Role<br/>Operational]
+    B --> C[Specific Permissions<br/>• Infrastructure provisioning<br/>• Resource management<br/>• Monitoring access<br/>• NO billing access<br/>• NO account deletion]
 ```
 
 ### Repository Access
@@ -83,12 +77,13 @@ Specific Permissions
 - Audit logging enabled
 
 **RBAC Model**:
-```yaml
-Clark Service Account:
-  - crossplane-system namespace: full access
-  - Resource management: create/update/delete
-  - No application namespace access
-  - No secret read access (except Crossplane-managed)
+
+```mermaid
+flowchart TD
+    A[Clark Service Account] --> B[crossplane-system namespace<br/>full access]
+    A --> C[Resource management<br/>create/update/delete]
+    A --> D[NO application namespace access]
+    A --> E[NO secret read access<br/>except Crossplane-managed]
 ```
 
 ## Network Security

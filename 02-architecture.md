@@ -9,41 +9,25 @@ Clark Platform consists of two core layers that work together to provide managed
 
 ## Component Diagram
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    Customer Cloud Account                     │
-│                                                               │
-│  ┌──────────────────────────────────────────────────────┐   │
-│  │         clark-platform-infra (Terraform)              │   │
-│  │  • Cloud Accounts & Subscriptions                     │   │
-│  │  • Networking (VPC/VNet, Subnets, Routing)            │   │
-│  │  • Kubernetes Clusters                                │   │
-│  │  • IAM & Access Boundaries                            │   │
-│  │  • Logging & Monitoring Baselines                     │   │
-│  │  • Terraform State & Backend                          │   │
-│  └──────────────────────────────────────────────────────┘   │
-│                          ↓                                    │
-│  ┌──────────────────────────────────────────────────────┐   │
-│  │      Kubernetes Cluster (Customer Owned)              │   │
-│  │                                                         │   │
-│  │  ┌─────────────────────────────────────────────────┐  │   │
-│  │  │  clark-platform-control (Crossplane)            │  │   │
-│  │  │  • Declarative Cloud Services                    │  │   │
-│  │  │  • Databases, Storage, Queues                    │  │   │
-│  │  │  • Managed Kubernetes Addons                     │  │   │
-│  │  │  • Provider Abstraction (AWS/GCP/Azure)          │  │   │
-│  │  │  • Policy & Guardrails                           │  │   │
-│  │  │  • Platform GitOps                               │  │   │
-│  │  └─────────────────────────────────────────────────┘  │   │
-│  │                                                         │   │
-│  │  ┌─────────────────────────────────────────────────┐  │   │
-│  │  │  Application Workloads (Customer Owned)         │  │   │
-│  │  │  • Application Deployments                       │  │   │
-│  │  │  • Application GitOps (Optional)                 │  │   │
-│  │  └─────────────────────────────────────────────────┘  │   │
-│  └──────────────────────────────────────────────────────┘   │
-│                                                               │
-└─────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TB
+    subgraph CloudAccount["Customer Cloud Account"]
+        subgraph Infra["clark-platform-infra (Terraform)"]
+            InfraDetails["• Cloud Accounts & Subscriptions<br/>• Networking (VPC/VNet, Subnets, Routing)<br/>• Kubernetes Clusters<br/>• IAM & Access Boundaries<br/>• Logging & Monitoring Baselines<br/>• Terraform State & Backend"]
+        end
+        
+        subgraph K8s["Kubernetes Cluster (Customer Owned)"]
+            subgraph Control["clark-platform-control (Crossplane)"]
+                ControlDetails["• Declarative Cloud Services<br/>• Databases, Storage, Queues<br/>• Managed Kubernetes Addons<br/>• Provider Abstraction (AWS/GCP/Azure)<br/>• Policy & Guardrails<br/>• Platform GitOps"]
+            end
+            
+            subgraph Apps["Application Workloads (Customer Owned)"]
+                AppDetails["• Application Deployments<br/>• Application GitOps (Optional)"]
+            end
+        end
+    end
+    
+    Infra -->|Provisions| K8s
 ```
 
 ## Infrastructure Layer: clark-platform-infra
@@ -111,18 +95,13 @@ The control plane layer uses Crossplane to manage cloud services declaratively t
 
 ### Platform GitOps Flow
 
-```
-Developer PR
-   ↓
-Customer Git Repo (clark-platform-control)
-   ↓
-Clark Review & Approval
-   ↓
-Crossplane Control Plane
-   ↓
-Cloud Provider API
-   ↓
-Resource Provisioned
+```mermaid
+flowchart LR
+    A[Developer PR] --> B[Customer Git Repo<br/>clark-platform-control]
+    B --> C[Clark Review & Approval]
+    C --> D[Crossplane Control Plane]
+    D --> E[Cloud Provider API]
+    E --> F[Resource Provisioned]
 ```
 
 ### Application GitOps

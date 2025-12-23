@@ -58,30 +58,24 @@ Clark provides structure, safety, and speed — not control.
 
 ## Slide 5: Architecture Overview
 
-```
-┌─────────────────────────────────────────┐
-│      Your Cloud Account (You Own)       │
-│                                         │
-│  ┌───────────────────────────────────┐ │
-│  │ clark-platform-infra (Terraform)  │ │
-│  │ • Networks, Clusters, IAM         │ │
-│  └──────────────┬────────────────────┘ │
-│                 ↓                        │
-│  ┌───────────────────────────────────┐ │
-│  │ Kubernetes Cluster (You Own)      │ │
-│  │                                    │ │
-│  │  ┌──────────────────────────────┐  │ │
-│  │  │ clark-platform-control       │  │ │
-│  │  │ (Crossplane)                 │  │ │
-│  │  │ • Databases, Storage, Queues │  │ │
-│  │  └──────────────────────────────┘  │ │
-│  │                                    │ │
-│  │  ┌──────────────────────────────┐  │ │
-│  │  │ Your Applications             │  │ │
-│  │  │ (You Own & Operate)          │  │ │
-│  │  └──────────────────────────────┘  │ │
-│  └────────────────────────────────────┘ │
-└─────────────────────────────────────────┘
+```mermaid
+flowchart TB
+    subgraph CloudAccount["Your Cloud Account (You Own)"]
+        subgraph Infra["clark-platform-infra (Terraform)"]
+            InfraDetails["• Networks, Clusters, IAM"]
+        end
+        
+        subgraph K8s["Kubernetes Cluster (You Own)"]
+            subgraph Control["clark-platform-control (Crossplane)"]
+                ControlDetails["• Databases, Storage, Queues"]
+            end
+            
+            subgraph Apps["Your Applications<br/>(You Own & Operate)"]
+            end
+        end
+    end
+    
+    Infra -->|Provisions| K8s
 ```
 
 ---
@@ -140,9 +134,14 @@ Clark provides structure, safety, and speed — not control.
 - Your CI/CD
 
 **Workflow**:
-```
-Developer PR → Your Repo → Clark Review → 
-Crossplane → Cloud Provider → Resource Created
+
+```mermaid
+flowchart LR
+    A[Developer PR] --> B[Your Repo]
+    B --> C[Clark Review]
+    C --> D[Crossplane]
+    D --> E[Cloud Provider]
+    E --> F[Resource Created]
 ```
 
 ---

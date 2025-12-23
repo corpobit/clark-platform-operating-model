@@ -125,29 +125,14 @@ clark-platform-control/
 
 ## Repository Relationships
 
-```
-┌─────────────────────────────────────────┐
-│   clark-platform-infra (Terraform)      │
-│   • Provisions foundational infra       │
-│   • Creates Kubernetes cluster          │
-└──────────────┬──────────────────────────┘
-               │
-               ↓
-┌─────────────────────────────────────────┐
-│   Kubernetes Cluster (Customer Owned)   │
-│                                          │
-│   ┌──────────────────────────────────┐  │
-│   │ clark-platform-control           │  │
-│   │ (Crossplane)                     │  │
-│   │ • Manages cloud services         │  │
-│   │ • Installed on cluster           │  │
-│   └──────────────────────────────────┘  │
-│                                          │
-│   ┌──────────────────────────────────┐  │
-│   │ Application Workloads             │  │
-│   │ (Customer Owned)                  │  │
-│   └──────────────────────────────────┘  │
-└─────────────────────────────────────────┘
+```mermaid
+flowchart TB
+    Infra[clark-platform-infra (Terraform)<br/>• Provisions foundational infra<br/>• Creates Kubernetes cluster] --> K8s[Kubernetes Cluster<br/>(Customer Owned)]
+    
+    subgraph K8s
+        Control[clark-platform-control (Crossplane)<br/>• Manages cloud services<br/>• Installed on cluster]
+        Apps[Application Workloads<br/>(Customer Owned)]
+    end
 ```
 
 ## Optional Repositories

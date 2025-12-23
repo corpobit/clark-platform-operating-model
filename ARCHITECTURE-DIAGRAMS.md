@@ -4,430 +4,214 @@
 
 ### High-Level Overview
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                    Customer Cloud Account                         │
-│                    (Customer Owned)                              │
-│                                                                   │
-│  ┌───────────────────────────────────────────────────────────┐  │
-│  │         clark-platform-infra Repository                    │  │
-│  │         (Customer Owned, Clark Maintained)                │  │
-│  │                                                             │  │
-│  │  Terraform Modules:                                         │  │
-│  │  • Networking (VPC/VNet, Subnets, Routing)                │  │
-│  │  • Kubernetes Clusters (EKS/GKE/AKS)                       │  │
-│  │  • IAM Roles & Policies                                     │  │
-│  │  • Logging & Monitoring Setup                              │  │
-│  │  • Terraform State Backend                                  │  │
-│  └───────────────────────┬─────────────────────────────────────┘  │
-│                          │                                         │
-│                          ↓ Provisions                              │
-│                                                                   │
-│  ┌───────────────────────────────────────────────────────────┐  │
-│  │         Kubernetes Cluster                                  │  │
-│  │         (Customer Owned)                                    │  │
-│  │                                                             │  │
-│  │  ┌─────────────────────────────────────────────────────┐   │  │
-│  │  │  clark-platform-control (Crossplane)               │   │  │
-│  │  │  (Customer Owned, Clark Maintained)                │   │  │
-│  │  │                                                      │   │  │
-│  │  │  • Crossplane Core                                   │   │  │
-│  │  │  • Provider Configs (AWS/GCP/Azure)                 │   │  │
-│  │  │  • Compositions (Databases, Storage, Queues)        │   │  │
-│  │  │  • Policies (OPA, Resource Limits)                  │   │  │
-│  │  │  • GitOps Controller                                 │   │  │
-│  │  └─────────────────────────────────────────────────────┘   │  │
-│  │                                                             │  │
-│  │  ┌─────────────────────────────────────────────────────┐   │  │
-│  │  │  Application Workloads                              │   │  │
-│  │  │  (Customer Owned & Operated)                        │   │  │
-│  │  │                                                      │   │  │
-│  │  │  • Application Pods                                  │   │  │
-│  │  │  • Application Services                              │   │  │
-│  │  │  • Application ConfigMaps & Secrets                  │   │  │
-│  │  └─────────────────────────────────────────────────────┘   │  │
-│  └───────────────────────────────────────────────────────────┘  │
-│                                                                   │
-└─────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TB
+    subgraph CloudAccount["Customer Cloud Account (Customer Owned)"]
+        subgraph InfraRepo["clark-platform-infra Repository<br/>(Customer Owned, Clark Maintained)"]
+            Terraform["Terraform Modules<br/>• Networking (VPC/VNet, Subnets, Routing)<br/>• Kubernetes Clusters (EKS/GKE/AKS)<br/>• IAM Roles & Policies<br/>• Logging & Monitoring Setup<br/>• Terraform State Backend"]
+        end
+        
+        subgraph K8sCluster["Kubernetes Cluster (Customer Owned)"]
+            subgraph ControlPlane["clark-platform-control (Crossplane)<br/>(Customer Owned, Clark Maintained)"]
+                Crossplane["• Crossplane Core<br/>• Provider Configs (AWS/GCP/Azure)<br/>• Compositions (Databases, Storage, Queues)<br/>• Policies (OPA, Resource Limits)<br/>• GitOps Controller"]
+            end
+            
+            subgraph Apps["Application Workloads<br/>(Customer Owned & Operated)"]
+                AppWorkloads["• Application Pods<br/>• Application Services<br/>• Application ConfigMaps & Secrets"]
+            end
+        end
+    end
+    
+    Terraform -->|Provisions| K8sCluster
 ```
 
 ## GitOps Workflow
 
 ### Platform GitOps Flow
 
-```
-┌──────────────┐
-│   Developer  │
-│   Creates PR │
-└──────┬───────┘
-       │
-       ↓
-┌──────────────────────────────────┐
-│  clark-platform-control          │
-│  Repository (Customer Owned)      │
-│  • Service Definition             │
-│  • Crossplane Resource            │
-└──────┬───────────────────────────┘
-       │
-       ↓
-┌──────────────────────────────────┐
-│  Clark Team Review                │
-│  • Policy Compliance              │
-│  • Resource Limits                │
-│  • Best Practices                 │
-└──────┬───────────────────────────┘
-       │
-       ↓
-┌──────────────────────────────────┐
-│  PR Merged to Main                │
-└──────┬───────────────────────────┘
-       │
-       ↓
-┌──────────────────────────────────┐
-│  Crossplane Controller            │
-│  • Detects Change                 │
-│  • Reconciles State               │
-└──────┬───────────────────────────┘
-       │
-       ↓
-┌──────────────────────────────────┐
-│  Cloud Provider API               │
-│  • AWS / GCP / Azure              │
-└──────┬───────────────────────────┘
-       │
-       ↓
-┌──────────────────────────────────┐
-│  Resource Provisioned             │
-│  • Database / Storage / Queue     │
-│  • Credentials in K8s Secrets     │
-└──────────────────────────────────┘
+```mermaid
+sequenceDiagram
+    participant Dev as Developer
+    participant Repo as clark-platform-control<br/>Repository<br/>(Customer Owned)
+    participant Clark as Clark Team Review
+    participant Main as Main Branch
+    participant XP as Crossplane Controller
+    participant Cloud as Cloud Provider API<br/>(AWS/GCP/Azure)
+    participant Resource as Resource Provisioned
+    
+    Dev->>Repo: Creates PR<br/>(Service Definition,<br/>Crossplane Resource)
+    Repo->>Clark: Review Request
+    Clark->>Clark: Policy Compliance<br/>Resource Limits<br/>Best Practices
+    Clark->>Main: Approve & Merge
+    Main->>XP: Detects Change
+    XP->>XP: Reconciles State
+    XP->>Cloud: API Call
+    Cloud->>Resource: Provision Resource<br/>(Database/Storage/Queue)
+    Resource->>Resource: Credentials in K8s Secrets
 ```
 
 ## Responsibility Matrix Visual
 
 ### Ownership and Operation
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    OWNERSHIP MODEL                           │
-├─────────────────────────────────────────────────────────────┤
-│                                                               │
-│  CUSTOMER OWNS:                    CLARK OPERATES:           │
-│  ┌─────────────────────┐          ┌─────────────────────┐   │
-│  │ • Cloud Accounts     │          │ • Infrastructure     │   │
-│  │ • Git Repositories   │          │   Provisioning       │   │
-│  │ • Kubernetes Cluster │          │ • Control Plane      │   │
-│  │ • Infrastructure     │          │   Management         │   │
-│  │ • Application Code   │          │ • GitOps Workflows   │   │
-│  │ • Data               │          │ • Monitoring         │   │
-│  └─────────────────────┘          └─────────────────────┘   │
-│                                                               │
-│  SHARED RESPONSIBILITY:                                       │
-│  ┌─────────────────────────────────────────────────────┐     │
-│  │ • Security Policies                                  │     │
-│  │ • Cost Management                                    │     │
-│  │ • Compliance                                         │     │
-│  │ • Performance Optimization                           │     │
-│  └─────────────────────────────────────────────────────┘     │
-└─────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart LR
+    subgraph Customer["CUSTOMER OWNS"]
+        CA[Cloud Accounts]
+        GR[Git Repositories]
+        KC[Kubernetes Cluster]
+        INF[Infrastructure]
+        AC[Application Code]
+        DATA[Data]
+    end
+    
+    subgraph Clark["CLARK OPERATES"]
+        IP[Infrastructure<br/>Provisioning]
+        CP[Control Plane<br/>Management]
+        GW[GitOps Workflows]
+        MON[Monitoring]
+    end
+    
+    subgraph Shared["SHARED RESPONSIBILITY"]
+        SP[Security Policies]
+        CM[Cost Management]
+        COMP[Compliance]
+        PO[Performance<br/>Optimization]
+    end
 ```
 
 ## Repository Structure
 
 ### Repository Relationships
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                  REPOSITORY ECOSYSTEM                        │
-├─────────────────────────────────────────────────────────────┤
-│                                                               │
-│  ┌─────────────────────────────────────────────────────┐    │
-│  │  clark-platform-infra (Terraform)                   │    │
-│  │  Owner: Customer                                     │    │
-│  │  Maintainer: Clark                                   │    │
-│  │                                                       │    │
-│  │  Structure:                                           │    │
-│  │  ├── environments/                                    │    │
-│  │  │   ├── dev/                                        │    │
-│  │  │   ├── staging/                                    │    │
-│  │  │   └── production/                                 │    │
-│  │  ├── modules/                                        │    │
-│  │  │   ├── networking/                                 │    │
-│  │  │   ├── kubernetes/                                │    │
-│  │  │   └── iam/                                       │    │
-│  │  └── terraform.tf                                   │    │
-│  └─────────────────────────────────────────────────────┘    │
-│                          │                                    │
-│                          ↓ Provisions                         │
-│                          │                                    │
-│  ┌─────────────────────────────────────────────────────┐    │
-│  │  clark-platform-control (Crossplane)                │    │
-│  │  Owner: Customer                                     │    │
-│  │  Maintainer: Clark                                   │    │
-│  │                                                       │    │
-│  │  Structure:                                           │    │
-│  │  ├── compositions/                                    │    │
-│  │  │   ├── databases/                                  │    │
-│  │  │   ├── storage/                                    │    │
-│  │  │   └── queues/                                     │    │
-│  │  ├── providers/                                       │    │
-│  │  │   ├── aws/                                        │    │
-│  │  │   ├── gcp/                                        │    │
-│  │  │   └── azure/                                      │    │
-│  │  ├── policies/                                        │    │
-│  │  └── examples/                                        │    │
-│  └─────────────────────────────────────────────────────┘    │
-│                                                               │
-│  ┌─────────────────────────────────────────────────────┐    │
-│  │  Application Repositories (Optional)                 │    │
-│  │  Owner: Customer                                     │    │
-│  │  Managed: Customer (Clark can support)               │    │
-│  │                                                       │    │
-│  │  • Application Code                                   │    │
-│  │  • Application GitOps (ArgoCD/Flux)                  │    │
-│  │  • CI/CD Pipelines                                    │    │
-│  └─────────────────────────────────────────────────────┘    │
-└─────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TB
+    subgraph RepoEco["REPOSITORY ECOSYSTEM"]
+        subgraph InfraRepo["clark-platform-infra (Terraform)<br/>Owner: Customer | Maintainer: Clark"]
+            InfraStruct["Structure:<br/>├── environments/<br/>│   ├── dev/<br/>│   ├── staging/<br/>│   └── production/<br/>├── modules/<br/>│   ├── networking/<br/>│   ├── kubernetes/<br/>│   └── iam/<br/>└── terraform.tf"]
+        end
+        
+        subgraph ControlRepo["clark-platform-control (Crossplane)<br/>Owner: Customer | Maintainer: Clark"]
+            ControlStruct["Structure:<br/>├── compositions/<br/>│   ├── databases/<br/>│   ├── storage/<br/>│   └── queues/<br/>├── providers/<br/>│   ├── aws/<br/>│   ├── gcp/<br/>│   └── azure/<br/>├── policies/<br/>└── examples/"]
+        end
+        
+        subgraph AppRepo["Application Repositories (Optional)<br/>Owner: Customer | Managed: Customer<br/>(Clark can support)"]
+            AppStruct["• Application Code<br/>• Application GitOps (ArgoCD/Flux)<br/>• CI/CD Pipelines"]
+        end
+    end
+    
+    InfraRepo -->|Provisions| ControlRepo
 ```
 
 ## Service Provisioning Flow
 
 ### End-to-End Service Request
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│              SERVICE PROVISIONING JOURNEY                    │
-├─────────────────────────────────────────────────────────────┤
-│                                                               │
-│  1. DEVELOPER NEEDS SERVICE                                  │
-│     ┌────────────────────┐                                   │
-│     │ "I need a database"│                                   │
-│     └─────────┬──────────┘                                   │
-│               ↓                                               │
-│  2. CREATE PR IN REPOSITORY                                  │
-│     ┌─────────────────────────────────────┐                 │
-│     │ apiVersion: database.example.org/v1 │                 │
-│     │ kind: Database                       │                 │
-│     │ metadata:                            │                 │
-│     │   name: my-database                   │                 │
-│     │ spec:                                │                 │
-│     │   engine: postgres                    │                 │
-│     │   version: "14"                       │                 │
-│     └─────────┬─────────────────────────────┘                 │
-│               ↓                                               │
-│  3. CLARK REVIEWS PR                                          │
-│     ┌─────────────────────────────────────┐                 │
-│     │ ✓ Policy compliance                  │                 │
-│     │ ✓ Resource limits                    │                 │
-│     │ ✓ Best practices                     │                 │
-│     │ ✓ Approved                           │                 │
-│     └─────────┬─────────────────────────────┘                 │
-│               ↓                                               │
-│  4. PR MERGED                                                │
-│     ┌────────────────────┐                                   │
-│     │ Merge to main       │                                   │
-│     └─────────┬──────────┘                                   │
-│               ↓                                               │
-│  5. CROSSPLANE DETECTS CHANGE                                │
-│     ┌─────────────────────────────────────┐                 │
-│     │ • Watches Git repository             │                 │
-│     │ • Detects new resource              │                 │
-│     │ • Starts reconciliation             │                 │
-│     └─────────┬─────────────────────────────┘                 │
-│               ↓                                               │
-│  6. CLOUD PROVIDER API CALL                                  │
-│     ┌─────────────────────────────────────┐                 │
-│     │ • Create RDS / Cloud SQL / etc.     │                 │
-│     │ • Configure networking               │                 │
-│     │ • Set up security                    │                 │
-│     └─────────┬─────────────────────────────┘                 │
-│               ↓                                               │
-│  7. RESOURCE PROVISIONED                                     │
-│     ┌─────────────────────────────────────┐                 │
-│     │ • Database created                   │                 │
-│     │ • Credentials in K8s secrets         │                 │
-│     │ • Status updated in Git              │                 │
-│     │ • Ready for use                      │                 │
-│     └─────────────────────────────────────┘                 │
-│                                                               │
-└─────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    Start([Developer Needs Service<br/>I need a database]) --> CreatePR[Create PR in Repository<br/>apiVersion: database.example.org/v1<br/>kind: Database<br/>spec: engine: postgres, version: 14]
+    CreatePR --> Review[Clark Reviews PR<br/>✓ Policy compliance<br/>✓ Resource limits<br/>✓ Best practices<br/>✓ Approved]
+    Review --> Merge[PR Merged to Main]
+    Merge --> Detect[Crossplane Detects Change<br/>• Watches Git repository<br/>• Detects new resource<br/>• Starts reconciliation]
+    Detect --> API[Cloud Provider API Call<br/>• Create RDS / Cloud SQL / etc.<br/>• Configure networking<br/>• Set up security]
+    API --> Provisioned[Resource Provisioned<br/>• Database created<br/>• Credentials in K8s secrets<br/>• Status updated in Git<br/>• Ready for use]
 ```
 
 ## Access Control Model
 
 ### Access Hierarchy
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    ACCESS CONTROL MODEL                      │
-├─────────────────────────────────────────────────────────────┤
-│                                                               │
-│  CLOUD ACCOUNT LEVEL                                          │
-│  ┌─────────────────────────────────────────────────────┐    │
-│  │ Customer: Account Owner (Full Control)              │    │
-│  │ Clark: IAM Role (Operational Access Only)           │    │
-│  │   • Infrastructure provisioning                      │    │
-│  │   • Resource management                              │    │
-│  │   • Monitoring access                                │    │
-│  │   • NO billing access                               │    │
-│  │   • NO account deletion                              │    │
-│  └─────────────────────────────────────────────────────┘    │
-│                          │                                    │
-│                          ↓                                    │
-│  REPOSITORY LEVEL                                             │
-│  ┌─────────────────────────────────────────────────────┐    │
-│  │ Customer: Repository Owner (Full Control)            │    │
-│  │ Clark: Maintainer (Can merge PRs, cannot delete)    │    │
-│  │ Development Teams: Contributor (Can create PRs)     │    │
-│  └─────────────────────────────────────────────────────┘    │
-│                          │                                    │
-│                          ↓                                    │
-│  KUBERNETES CLUSTER LEVEL                                    │
-│  ┌─────────────────────────────────────────────────────┐    │
-│  │ Customer: Cluster Admin (Full Control)              │    │
-│  │ Clark: Service Account (Crossplane Management Only) │    │
-│  │   • crossplane-system namespace: full access        │    │
-│  │   • Resource management: create/update/delete       │    │
-│  │   • NO application namespace access                  │    │
-│  │   • NO secret read access (except Crossplane)       │    │
-│  └─────────────────────────────────────────────────────┘    │
-│                                                               │
-└─────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph CloudLevel["CLOUD ACCOUNT LEVEL"]
+        CloudCust[Customer: Account Owner<br/>Full Control]
+        CloudClark[Clark: IAM Role<br/>Operational Access Only<br/>• Infrastructure provisioning<br/>• Resource management<br/>• Monitoring access<br/>• NO billing access<br/>• NO account deletion]
+    end
+    
+    subgraph RepoLevel["REPOSITORY LEVEL"]
+        RepoCust[Customer: Repository Owner<br/>Full Control]
+        RepoClark[Clark: Maintainer<br/>Can merge PRs, cannot delete]
+        RepoDev[Development Teams: Contributor<br/>Can create PRs]
+    end
+    
+    subgraph K8sLevel["KUBERNETES CLUSTER LEVEL"]
+        K8sCust[Customer: Cluster Admin<br/>Full Control]
+        K8sClark[Clark: Service Account<br/>Crossplane Management Only<br/>• crossplane-system namespace: full access<br/>• Resource management: create/update/delete<br/>• NO application namespace access<br/>• NO secret read access (except Crossplane)]
+    end
+    
+    CloudLevel --> RepoLevel
+    RepoLevel --> K8sLevel
 ```
 
 ## Optional Services Integration
 
 ### Service Add-Ons Architecture
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│              OPTIONAL SERVICES INTEGRATION                   │
-├─────────────────────────────────────────────────────────────┤
-│                                                               │
-│  BASELINE (Always Included)                                  │
-│  ┌─────────────────────────────────────────────────────┐    │
-│  │ • clark-platform-infra (Terraform)                  │    │
-│  │ • clark-platform-control (Crossplane)               │    │
-│  │ • Basic monitoring                                   │    │
-│  └─────────────────────────────────────────────────────┘    │
-│                          │                                    │
-│                          ↓                                    │
-│  OPTIONAL SERVICES (Add-Ons)                                 │
-│  ┌─────────────────────────────────────────────────────┐    │
-│  │                                                     │    │
-│  │  ┌──────────────┐  ┌──────────────┐  ┌──────────┐ │    │
-│  │  │   Secrets    │  │  App GitOps  │  │   CI/CD   │ │    │
-│  │  │  Management  │  │  (ArgoCD/    │  │  Pipelines│ │    │
-│  │  │              │  │   Flux)      │  │           │ │    │
-│  │  └──────────────┘  └──────────────┘  └──────────┘ │    │
-│  │                                                     │    │
-│  │  ┌──────────────┐  ┌──────────────┐               │    │
-│  │  │Observability │  │   Security   │               │    │
-│  │  │(Prometheus/  │  │   (OPA/      │               │    │
-│  │  │  Grafana)    │  │   Kyverno)   │               │    │
-│  │  └──────────────┘  └──────────────┘               │    │
-│  │                                                     │    │
-│  └─────────────────────────────────────────────────────┘    │
-│                                                               │
-└─────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TB
+    subgraph Baseline["BASELINE (Always Included)"]
+        Infra[clark-platform-infra<br/>(Terraform)]
+        Control[clark-platform-control<br/>(Crossplane)]
+        Monitor[Basic monitoring]
+    end
+    
+    subgraph Optional["OPTIONAL SERVICES (Add-Ons)"]
+        Secrets[Secrets Management<br/>AWS Secrets Manager<br/>Azure Key Vault<br/>Vault]
+        GitOps[App GitOps<br/>ArgoCD / Flux]
+        CICD[CI/CD Pipelines<br/>GitHub Actions<br/>GitLab CI]
+        Observability[Observability<br/>Prometheus / Grafana]
+        Security[Security<br/>OPA / Kyverno]
+    end
+    
+    Baseline --> Optional
 ```
 
 ## Onboarding Timeline
 
 ### 4-Week Onboarding Process
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    ONBOARDING TIMELINE                       │
-├─────────────────────────────────────────────────────────────┤
-│                                                               │
-│  WEEK 1: SETUP & PREPARATION                                 │
-│  ┌─────────────────────────────────────────────────────┐    │
-│  │ • Cloud account setup                                │    │
-│  │ • Repository cloning                                 │    │
-│  │ • Requirements gathering                             │    │
-│  │ • Initial configuration                              │    │
-│  └─────────────────────────────────────────────────────┘    │
-│                          │                                    │
-│                          ↓                                    │
-│  WEEK 2-3: INFRASTRUCTURE PROVISIONING                       │
-│  ┌─────────────────────────────────────────────────────┐    │
-│  │ • Network infrastructure (VPC/VNet)                 │    │
-│  │ • Kubernetes cluster creation                       │    │
-│  │ • IAM and security setup                            │    │
-│  │ • Monitoring baseline                                │    │
-│  └─────────────────────────────────────────────────────┘    │
-│                          │                                    │
-│                          ↓                                    │
-│  WEEK 3-4: CONTROL PLANE & TRAINING                          │
-│  ┌─────────────────────────────────────────────────────┐    │
-│  │ • Crossplane installation                           │    │
-│  │ • GitOps workflow setup                             │    │
-│  │ • First service provisioning                         │    │
-│  │ • Team training                                     │    │
-│  └─────────────────────────────────────────────────────┘    │
-│                          │                                    │
-│                          ↓                                    │
-│  WEEK 5-8: STABILIZATION                                     │
-│  ┌─────────────────────────────────────────────────────┐    │
-│  │ • Monitoring and optimization                        │    │
-│  │ • Issue resolution                                  │    │
-│  │ • Process refinement                                │    │
-│  │ • Ongoing support                                   │    │
-│  └─────────────────────────────────────────────────────┘    │
-│                                                               │
-└─────────────────────────────────────────────────────────────┘
+```mermaid
+gantt
+    title Onboarding Timeline
+    dateFormat YYYY-MM-DD
+    section Week 1
+    Cloud account setup           :2024-01-01, 7d
+    Repository cloning            :2024-01-01, 7d
+    Requirements gathering        :2024-01-01, 7d
+    Initial configuration         :2024-01-01, 7d
+    
+    section Week 2-3
+    Network infrastructure        :2024-01-08, 14d
+    Kubernetes cluster creation   :2024-01-08, 14d
+    IAM and security setup        :2024-01-08, 14d
+    Monitoring baseline           :2024-01-08, 14d
+    
+    section Week 3-4
+    Crossplane installation       :2024-01-22, 7d
+    GitOps workflow setup         :2024-01-22, 7d
+    First service provisioning    :2024-01-22, 7d
+    Team training                 :2024-01-22, 7d
+    
+    section Week 5-8
+    Monitoring and optimization   :2024-01-29, 28d
+    Issue resolution              :2024-01-29, 28d
+    Process refinement            :2024-01-29, 28d
+    Ongoing support              :2024-01-29, 28d
 ```
 
 ## Exit Process Flow
 
 ### Customer Exit Journey
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                      EXIT PROCESS                            │
-├─────────────────────────────────────────────────────────────┤
-│                                                               │
-│  1. NOTIFICATION                                              │
-│     ┌────────────────────┐                                   │
-│     │ Customer notifies │                                   │
-│     │ Clark of exit     │                                   │
-│     └─────────┬──────────┘                                   │
-│               ↓                                               │
-│  2. KNOWLEDGE TRANSFER                                        │
-│     ┌─────────────────────────────────────┐                 │
-│     │ • Documentation review              │                 │
-│     │ • Training sessions                 │                 │
-│     │ • Handover meetings                 │                 │
-│     │ • Q&A sessions                      │                 │
-│     └─────────┬─────────────────────────────┘                 │
-│               ↓                                               │
-│  3. ACCESS TRANSFER                                           │
-│     ┌─────────────────────────────────────┐                 │
-│     │ • Customer already has full access  │                 │
-│     │ • Transfer operational access       │                 │
-│     │ • Credential handover               │                 │
-│     │ • Access verification               │                 │
-│     └─────────┬─────────────────────────────┘                 │
-│               ↓                                               │
-│  4. CODE & CONFIG TRANSFER                                    │
-│     ┌─────────────────────────────────────┐                 │
-│     │ • Repository access (already owned) │                 │
-│     │ • Configuration export               │                 │
-│     │ • State transfer                     │                 │
-│     │ • Complete documentation package      │                 │
-│     └─────────┬─────────────────────────────┘                 │
-│               ↓                                               │
-│  5. SUPPORT TRANSITION                                        │
-│     ┌─────────────────────────────────────┐                 │
-│     │ • Optional transition period        │                 │
-│     │ • Support handoff                    │                 │
-│     │ • Final review and sign-off         │                 │
-│     └─────────────────────────────────────┘                 │
-│                                                               │
-│  TIMELINE: 2-4 weeks standard                                │
-│  NO PENALTIES: Exit anytime, no lock-in                      │
-│                                                               │
-└─────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    Start([Customer Notifies<br/>Clark of Exit]) --> Knowledge[Knowledge Transfer<br/>• Documentation review<br/>• Training sessions<br/>• Handover meetings<br/>• Q&A sessions]
+    Knowledge --> Access[Access Transfer<br/>• Customer already has full access<br/>• Transfer operational access<br/>• Credential handover<br/>• Access verification]
+    Access --> Code[Code & Config Transfer<br/>• Repository access (already owned)<br/>• Configuration export<br/>• State transfer<br/>• Complete documentation package]
+    Code --> Support[Support Transition<br/>• Optional transition period<br/>• Support handoff<br/>• Final review and sign-off]
+    Support --> End([Exit Complete])
+    
+    style Start fill:#e1f5ff
+    style End fill:#d4edda
 ```
 

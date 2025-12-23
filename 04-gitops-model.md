@@ -34,43 +34,21 @@ Platform GitOps manages infrastructure and cloud services through Git-driven wor
 
 ### Workflow
 
-```
-┌─────────────────┐
-│ Developer PR    │
-│ (Cloud Service) │
-└────────┬────────┘
-         │
-         ↓
-┌─────────────────┐
-│ Customer Git    │
-│ Repository      │
-│ (clark-platform-│
-│  control)       │
-└────────┬────────┘
-         │
-         ↓
-┌─────────────────┐
-│ Clark Review    │
-│ & Approval      │
-└────────┬────────┘
-         │
-         ↓
-┌─────────────────┐
-│ Crossplane      │
-│ Control Plane   │
-└────────┬────────┘
-         │
-         ↓
-┌─────────────────┐
-│ Cloud Provider  │
-│ API             │
-└────────┬────────┘
-         │
-         ↓
-┌─────────────────┐
-│ Resource        │
-│ Provisioned     │
-└─────────────────┘
+```mermaid
+sequenceDiagram
+    participant Dev as Developer
+    participant Repo as Customer Git Repository<br/>(clark-platform-control)
+    participant Clark as Clark Review & Approval
+    participant XP as Crossplane Control Plane
+    participant Cloud as Cloud Provider API
+    participant Resource as Resource Provisioned
+    
+    Dev->>Repo: Creates PR<br/>(Cloud Service)
+    Repo->>Clark: Review Request
+    Clark->>Repo: Approve
+    Repo->>XP: PR Merged
+    XP->>Cloud: API Call
+    Cloud->>Resource: Provision Resource
 ```
 
 ### Example: Requesting a Database
@@ -138,37 +116,12 @@ Application GitOps manages application deployments through Git-driven workflows.
 
 ### Workflow (Customer-Managed)
 
-```
-┌─────────────────┐
-│ Application     │
-│ Code Change     │
-└────────┬────────┘
-         │
-         ↓
-┌─────────────────┐
-│ CI/CD Pipeline  │
-│ (Customer Owned)│
-└────────┬────────┘
-         │
-         ↓
-┌─────────────────┐
-│ Application     │
-│ GitOps Repo     │
-│ (Customer Owned)│
-└────────┬────────┘
-         │
-         ↓
-┌─────────────────┐
-│ Application     │
-│ GitOps Tool     │
-│ (ArgoCD/Flux)   │
-└────────┬────────┘
-         │
-         ↓
-┌─────────────────┐
-│ Kubernetes      │
-│ Cluster         │
-└─────────────────┘
+```mermaid
+flowchart LR
+    A[Application<br/>Code Change] --> B[CI/CD Pipeline<br/>(Customer Owned)]
+    B --> C[Application GitOps Repo<br/>(Customer Owned)]
+    C --> D[Application GitOps Tool<br/>(ArgoCD/Flux)]
+    D --> E[Kubernetes<br/>Cluster]
 ```
 
 ### Clark's Role in Application GitOps

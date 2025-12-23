@@ -140,7 +140,7 @@ flowchart TD
     
     subgraph K8sLevel["KUBERNETES CLUSTER LEVEL"]
         K8sCust[Customer: Cluster Admin<br/>Full Control]
-        K8sClark[Clark: Service Account<br/>Crossplane Management Only<br/>• crossplane-system namespace: full access<br/>• Resource management: create/update/delete<br/>• NO application namespace access<br/>• NO secret read access (except Crossplane)]
+        K8sClark["Clark: Service Account<br/>Crossplane Management Only<br/>• crossplane-system namespace: full access<br/>• Resource management: create/update/delete<br/>• NO application namespace access<br/>• NO secret read access except Crossplane"]
     end
     
     CloudLevel --> RepoLevel
@@ -153,13 +153,13 @@ flowchart TD
 
 ```mermaid
 flowchart TB
-    subgraph Baseline["BASELINE (Always Included)"]
-        Infra[clark-platform-infra<br/>(Terraform)]
-        Control[clark-platform-control<br/>(Crossplane)]
+    subgraph Baseline["BASELINE<br/>Always Included"]
+        Infra["clark-platform-infra<br/>Terraform"]
+        Control["clark-platform-control<br/>Crossplane"]
         Monitor[Basic monitoring]
     end
     
-    subgraph Optional["OPTIONAL SERVICES (Add-Ons)"]
+    subgraph Optional["OPTIONAL SERVICES<br/>Add-Ons"]
         Secrets[Secrets Management<br/>AWS Secrets Manager<br/>Azure Key Vault<br/>Vault]
         GitOps[App GitOps<br/>ArgoCD / Flux]
         CICD[CI/CD Pipelines<br/>GitHub Actions<br/>GitLab CI]

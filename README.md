@@ -26,6 +26,7 @@ This repository contains comprehensive documentation about the Clark Platform op
 - **[Executive Summary](SUMMARY.md)** - One-page overview
 - **[Architecture Diagrams](ARCHITECTURE-DIAGRAMS.md)** - Visual architecture diagrams
 - **[Comparison Tables](COMPARISON-TABLES.md)** - Comprehensive comparison tables
+- **[Real-World Scenario](SCENARIO-EXAMPLE.md)** - Complete example with microservices, multi-region setup
 - **[Sales Presentation](presentation.md)** - Sales and onboarding deck
 
 ## Quick Start
